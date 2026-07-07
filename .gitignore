@@ -1,0 +1,19 @@
+# Arquivos compilados
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Binários
+/bin/
+
+/vendor/
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
