@@ -4,10 +4,15 @@ import (
 	"api-restaurante/models"
 	"api-restaurante/repository"
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
-func ProcessarPagamento(w http.ResponseWriter, r *http.Request) {
+func ProcessarPagamento(
+	pedidoRepo *repository.PedidoRepository,
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	var pagamento models.Pagamento
 
 	err := json.NewDecoder(r.Body).Decode(&pagamento)
@@ -21,13 +26,18 @@ func ProcessarPagamento(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pedido, ok := repository.AtualizarStatus(
+	pedido, err := pedidoRepo.AtualizarStatusDB(
+		r.Context(),
 		pagamento.PedidoID,
 		"PAGO",
 	)
 
-	if !ok {
-		http.Error(w, "Pedido não encontrado", http.StatusNotFound)
+	if err != nil {
+		if errors.Is(err, repository.ErrpedidoNaoEncontrado) {
+			http.Error(w, "Pedido não encontrado", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Erro ao atualizar status do pedido", http.StatusInternalServerError)
 		return
 	}
 

@@ -14,7 +14,9 @@ func ConfigurarRotas(pedidoRepo *repository.PedidoRepository) {
 	http.HandleFunc("/", handler.Home)
 
 	//Pagamentos
-	http.HandleFunc("/pagamentos", handler.ProcessarPagamento)
+	http.HandleFunc("/pagamentos", func(w http.ResponseWriter, r *http.Request) {
+		handler.ProcessarPagamento(pedidoRepo, w, r)
+	})
 
 	// Pedidos
 	http.HandleFunc("/pedidos", func(w http.ResponseWriter, r *http.Request) {
